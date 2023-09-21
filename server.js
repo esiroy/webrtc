@@ -9,7 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const http = require('http').createServer(app);
 const https = require('https');
-const port = process.env.PORT || 40002;
+const port = process.env.PORT || 40010;
 
 //const server = require('http').Server(app);
 
