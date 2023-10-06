@@ -13,6 +13,7 @@ const port = process.env.PORT || 40010;
 
 //const server = require('http').Server(app);
 
+var users = [];
 
 var server = https.createServer({
     key: fs.readFileSync('./file.pem'),
@@ -79,24 +80,65 @@ io.on("connection", (socket) => {
 
     //console.log("user connected " + socket.id);
 
-    socket.on('newUser', data => {
-          
-        let id = data.id;
+    socket.on('newUser', function(data) {
+
+        let peerid = data.id;
         let roomID = data.roomID;
-        let user = data.user;
         
-        console.log(id, roomID, user.userid);        
-        
+        users.push({
+            'id': socket.id,
+            'peerid': peerid,
+            'userid': data.user.userid,
+            'username': data.user.username,
+            'user_image': data.user.user_image,
+            'nickname': data.user.nickname,
+            'status': data.user.status,
+            'type': data.user.type,
+        });
+       
+        console.log( users);
+
         socket.join(roomID);
         socket.to(roomID).broadcast.emit('userJoined', data);
+      
         
-        
+        /*
         socket.on('disconnect', () => {
             socket.to(roomID).broadcast.emit('userDisconnect', id);
         });
+        */
     });
     
+    socket.on('disconnect', function() {
+
+        console.log("disconnect", socket.id);
+
+        for (var i in users) {
+            if (users[i].id === socket.id) {
+
+               console.log("disconnected user :", users[i])
+
+                io.emit('WEBRTC_USER_LEAVE_SESSION', users[i]);
+                delete users[i];
+                break;
+            }
+        }      
+
+        users = users.filter(function(element) {
+            return element !== undefined;
+        });
+
+        update_webrtc_user_list();        
+    });    
     
+
+
+    function update_webrtc_user_list() {
+
+        io.emit('update_webrt_user_list', users);
+    }
+
+
     socket.on('changeMedia', (data) => {
     
     	console.log("user change media ");
@@ -108,7 +150,7 @@ io.on("connection", (socket) => {
         let videoStream = data.videoStream;
             	
     	socket.join(roomID);    		
-	socket.to(roomID).broadcast.emit('mediaChanged', data);    
+	    socket.to(roomID).broadcast.emit('mediaChanged', data);    
     
     });
     
