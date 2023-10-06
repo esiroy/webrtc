@@ -78,10 +78,9 @@ app.get('/:room', cors(corsOptionsDelegate), (req, res) => {
 
 io.on("connection", (socket) => {
 
-    //console.log("user connected " + socket.id);
+    
 
     socket.on('newUser', function(data) {
-
         let peerid = data.id;
         let roomID = data.roomID;
         
@@ -94,19 +93,13 @@ io.on("connection", (socket) => {
             'nickname': data.user.nickname,
             'status': data.user.status,
             'type': data.user.type,
-        });
-       
-        console.log( users);
+        });      
+        
+        console.log("new user joined", data.user.username);
 
         socket.join(roomID);
         socket.to(roomID).broadcast.emit('userJoined', data);
-      
-        
-        /*
-        socket.on('disconnect', () => {
-            socket.to(roomID).broadcast.emit('userDisconnect', id);
-        });
-        */
+    
     });
     
     socket.on('disconnect', function() {
