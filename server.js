@@ -200,6 +200,9 @@ io.on("connection", (socket) => {
     /*****************************************/
 
     socket.on("CALL_USER", (data) => {
+
+        console.log("CALL_USER", data.user.nickname);
+
         //io.to('' + data.channelid + '').emit("CALL_USER", data);
         io.sockets.emit("CALL_USER", data);
     });
