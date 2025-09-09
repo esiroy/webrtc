@@ -22,27 +22,24 @@ var server = https.createServer({
 
 
 
-const whitelist = [
-  'http://localhost:8000',
-  'http://localhost:8080',
-  'https://mypage.esuccess-inc.com',
-  'https://mypage.mytutor-jpn.com',
-  'https://beta.mytutor-jpn.com'
-];
+var whitelist = ['https://mypage.esuccess-inc.com', 
+    'https://mypage.mytutor-jpn.com', 
+    'https://beta.mytutor-jpn.com'
+]
 
-const io = require("socket.io")(server, {
-  cors: {
-    origin: function (origin, callback) {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
-        callback(null, true);  // ✅ allow if in whitelist
-      } else {
-        callback(new Error("Not allowed by CORS"));  // ❌ reject otherwise
-      }
-    },
-    methods: ["GET", "POST"],
-    credentials: true
+var corsOptionsDelegate = function (req, callback) {
+  var corsOptions;
+  if (whitelist.indexOf(req.header('Origin')) !== -1) {
+    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+  }else{
+    corsOptions = { origin: false } // disable CORS for this request
   }
-});
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
+
+const io = require("socket.io")(server, { cors: { origin: "*", methods: ["GET", "POST"] }});
+
 
 
 
