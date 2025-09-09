@@ -100,7 +100,7 @@ io.on("connection", (socket) => {
             'type': data.user.type,
         });      
         
-        console.log("new user joined", data.user.username);
+        console.log("new user joined", data);
 
         socket.join(roomID);
         socket.to(roomID).broadcast.emit('userJoined', data);
