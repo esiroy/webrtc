@@ -102,7 +102,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("CALL_USER", (data) => {
-    console.log("call user");
+    console.log("call user", data);
     //io.to('' + data.channelid + '').emit("CALL_USER", data);
     io.sockets.emit("CALL_USER", data);
   });
@@ -128,6 +128,45 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("❌ Client disconnected:", socket.id);
   });
+
+
+/*****************************************/
+    /*  CANVAS SERVER
+    /*****************************************/
+
+
+    socket.on("START_SLIDER", (data) => {
+        io.sockets.emit("START_SLIDER", data);
+    });
+
+
+   
+    socket.on("SEND_DRAWING", (data) => {
+        io.to(data.channelid).emit('UPDATE_DRAWING', data);        
+    });
+    
+
+    socket.on("CREATE_NEW_SLIDE", (data) => {
+        io.to('' + data.channelid + '').emit("CREATE_NEW_SLIDE", data);
+    });
+
+
+    socket.on("GOTO_SLIDE", (data) => {
+        io.to('' + data.channelid + '').emit("GOTO_SLIDE", data);
+    });
+
+
+    socket.on("SEND_SLIDE_PRIVATE_MESSAGE", (data) => {
+        io.to('' + data.channelid + '').emit("SEND_SLIDE_PRIVATE_MESSAGE", data);
+    });
+
+
+    socket.on("TUTOR_SELECTED_NEW_SLIDES", (data) => {
+        io.to('' + data.channelid + '').emit("TUTOR_SELECTED_NEW_SLIDES", data);
+    });
+
+
+    
 });
 
 
