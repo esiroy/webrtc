@@ -22,7 +22,7 @@ var server = https.createServer({
 
 
 
-var whitelist = ['https://mypage.esuccess-inc.com', 'https://mypage.mytutor-jpn.com']
+var whitelist = ['https://mypage.esuccess-inc.com', 'https://mypage.mytutor-jpn.com', "'https://beta.mytutor-jpn.com"]
 
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
@@ -35,23 +35,10 @@ var corsOptionsDelegate = function (req, callback) {
 }
 
 
-//const io = require("socket.io")(server, { cors: { origin: "*", methods: ["GET", "POST"] }});
+const io = require("socket.io")(server, { cors: { origin: "*", methods: ["GET", "POST"] }});
 
 
-const io = require('socket.io')(server, { wsEngine: 'ws' }, { 
-    cors: { 
-        origin: [
-            "http://localhost:8000",
-            "https://webrtc.mytutor-jpn.info",
-            "https://mypage.mytutor-jpn.info",
-            "https://mypage.esuccess-inc.com/",
-            "https://beta.mytutor-jpn.info"
-        ], 
-        methods: ["GET", "POST"], 
-        transports: ['websocket', 'polling'], 
-        credentials: true }, allowEIO3: true 
-    }
-);
+
 
 
 //const io = require('socket.io')(server, { wsEngine: 'ws' }, { cors: { origin: "*", methods: ["GET", "POST"], transports: ['websocket', 'polling'], credentials: true }, allowEIO3: true });
