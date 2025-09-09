@@ -44,7 +44,8 @@ const io = require('socket.io')(server, { wsEngine: 'ws' }, {
             "http://localhost:8000",
             "https://webrtc.mytutor-jpn.info",
             "https://mypage.mytutor-jpn.info",
-            "https://mypage.esuccess-inc.com/"
+            "https://mypage.esuccess-inc.com/",
+            "https://beta.mytutor-jpn.info"
         ], 
         methods: ["GET", "POST"], 
         transports: ['websocket', 'polling'], 
