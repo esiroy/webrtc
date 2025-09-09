@@ -212,16 +212,26 @@ io.on("connection", (socket) => {
     });
 
     socket.on("CALL_USER_PINGBACK", (data) => {
+
+        console.log("CALL_USER_PINGBACK", data);
+
         io.to('' + data.channelid + '').emit("CALL_USER_PINGBACK", data);
     });
 
 
     socket.on("ACCEPT_CALL", (data) => {
+
+        console.log("ACCEPT_CALL", data);
+
         io.sockets.emit("ACCEPT_CALL", data);
+        
     });
 
 
     socket.on("DROP_CALL", (data) => {
+
+         console.log("ACCEDROP_CALLPT_CALL", data);
+
         io.sockets.emit("DROP_CALL", data);
     });
 
