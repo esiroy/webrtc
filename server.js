@@ -79,7 +79,7 @@ app.get('/:room', cors(corsOptionsDelegate), (req, res) => {
 io.on("connection", (socket) => {    
 
 
-    console.log("user connected, with id " + socket.id)
+    console.log("test user connected, with id " + socket.id)
 
     socket.on('newUser', function(data) {
         let peerid = data.id;
