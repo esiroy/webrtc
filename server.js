@@ -135,16 +135,20 @@ io.on('connection', function(socket) {
     /*****************************************/
 
     socket.on("CALL_USER", (data) => {
+        console.log("call user");
         //io.to('' + data.channelid + '').emit("CALL_USER", data);
         io.sockets.emit("CALL_USER", data);
     });
 
     socket.on("CALL_USER_PINGBACK", (data) => {
+        console.log("call user pingback");
+
         io.to('' + data.channelid + '').emit("CALL_USER_PINGBACK", data);
     });
 
 
     socket.on("ACCEPT_CALL", (data) => {
+        console.log("accpet call");
         io.sockets.emit("ACCEPT_CALL", data);
     });
 
