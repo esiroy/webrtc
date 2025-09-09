@@ -81,6 +81,20 @@ var roomUsers = [];
 io.on("connection", (socket) => {
   console.log("🔌 New client connected:", socket.id);
 
+
+    socket.on('newUser', data => {          
+        let id = data.id;
+        let roomID = data.roomID;
+        let user = data.user;        
+        console.log(id, roomID, user.userid);                
+        socket.join(roomID);
+        socket.to(roomID).broadcast.emit('userJoined', data);
+        socket.on('disconnect', () => {
+            socket.to(roomID).broadcast.emit('userDisconnect', id);
+        });
+    });
+    
+    
   socket.on("REGISTER", (user) => {
     console.log("📢 User registered:", user);
 
