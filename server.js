@@ -39,14 +39,7 @@ var corsOptionsDelegate = function (req, callback) {
 
 
 const io = require("socket.io")(server, { cors: { origin: "*", methods: ["GET", "POST"] }});
-
-
-
-
-
 //const io = require('socket.io')(server, { wsEngine: 'ws' }, { cors: { origin: "*", methods: ["GET", "POST"], transports: ['websocket', 'polling'], credentials: true }, allowEIO3: true });
-
-
 
 const { ExpressPeerServer } = require('peer');
 
@@ -101,6 +94,9 @@ io.on("connection", (socket) => {
     }
   });
 
+    /*****************************************/
+    /*  MEMBER ALL PAGE CALL TO ACTIONS
+    /*****************************************/  
   socket.on("CALL_USER", (data) => {
     console.log("call user", data);
     //io.to('' + data.channelid + '').emit("CALL_USER", data);
@@ -166,6 +162,60 @@ io.on("connection", (socket) => {
     });
 
 
+
+
+    /*****************************************/
+    /*  SESSION ACTIONS
+    /*****************************************/
+
+    socket.on("JOIN_SESSION", (data) => {
+        io.to('' + data.channelid + '').emit("JOIN_SESSION", data);
+    });
+
+    //@desc: this will send a ping to determin if online
+    socket.on("JOIN_SESSION_PINGBACK", (data) => {
+        io.to('' + data.channelid + '').emit("JOIN_SESSION_PINGBACK", data);
+    });
+
+
+    //@desc: this will send a pingback to sender to signal online status
+    socket.on("TUTOR_JOINED", (data) => {
+        io.to('' + data.channelid + '').emit("TUTOR_JOINED", data);
+    });
+
+
+    socket.on("MEMBER_JOINED", (data) => {
+        io.to('' + data.channelid + '').emit("MEMBER_JOINED", data);
+    });
+
+    socket.on("LEAVE_SESSION", (data) => {
+        io.to('' + data.channelid + '').emit("LEAVE_SESSION", data);
+    });
+
+
+    socket.on("START_SESSION", (data) => {
+        io.to('' + data.channelid + '').emit("START_SESSION", data);
+    });
+
+    socket.on("CANCEL_SESSION", (data) => {
+        io.to('' + data.channelid + '').emit("CANCEL_SESSION", data);
+    });
+
+    socket.on("END_SESSION", (data) => {
+        io.to('' + data.channelid + '').emit("END_SESSION", data);
+    });
+
+    socket.on("START_MEMBER_TIMER", (data) => {
+        io.to('' + data.channelid + '').emit("START_MEMBER_TIMER", data);
+    });
+
+    socket.on("PAUSE_MEMBER_TIMER", (data) => {
+        io.to('' + data.channelid + '').emit("PAUSE_MEMBER_TIMER", data);
+    });
+
+    socket.on("STOP_MEMBER_TIMER", (data) => {
+        io.to('' + data.channelid + '').emit("STOP_MEMBER_TIMER", data);
+    });    
     
 });
 
