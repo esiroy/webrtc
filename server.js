@@ -37,26 +37,20 @@ var corsOptionsDelegate = function (req, callback) {
 
 //const io = require("socket.io")(server, { cors: { origin: "*", methods: ["GET", "POST"] }});
 
-const allowedOrigins = [
-  "http://localhost:8000",
-  "https://webrtc.mytutor-jpn.info",
-  "https://mypage.mytutor-jpn.info",
-  "https://mypage.esuccess-inc.com",
-];
 
-const io = require("socket.io")(server, {
-  cors: {
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
+const io = require('socket.io')(server, { wsEngine: 'ws' }, { 
+    cors: { 
+        origin: [
+            "http://localhost:8000",
+            "https://webrtc.mytutor-jpn.info",
+            "https://mypage.mytutor-jpn.info",
+            "https://mypage.esuccess-inc.com/"
+        ], 
+        methods: ["GET", "POST"], 
+        transports: ['websocket', 'polling'], 
+        credentials: true }, allowEIO3: true 
+    }
+);
 
 
 //const io = require('socket.io')(server, { wsEngine: 'ws' }, { cors: { origin: "*", methods: ["GET", "POST"], transports: ['websocket', 'polling'], credentials: true }, allowEIO3: true });
