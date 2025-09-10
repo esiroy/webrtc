@@ -11,16 +11,21 @@ const http = require('http').createServer(app);
 const https = require('https');
 const port = process.env.PORT || 40010;
 
-//const server = require('http').Server(app);
 
-var users = [];
+let server;
 
-var server = https.createServer({
+if (fs.existsSync('./file.pem') && fs.existsSync('./file.crt')) {
+  console.log("🔒 Using HTTPS with SSL certs");
+  server = https.createServer({
     key: fs.readFileSync('./file.pem'),
     cert: fs.readFileSync('./file.crt')
-}, app);
+  }, app);
+} else {
+  console.log("🌐 Using HTTP (no SSL certs found)");
+  server = http.createServer(app);
+}
 
-
+var users = [];
 
 var whitelist = ['https://mypage.esuccess-inc.com', 
     'https://mypage.mytutor-jpn.com', 
@@ -79,14 +84,17 @@ var users = [];
 var roomUsers = [];
 
 io.on("connection", (socket) => {
-  console.log("🔌 New client connected:", socket.id);
+
+    console.log("🔌 New client connected:", socket.id);
 
 
     socket.on('newUser', data => {          
         let id = data.id;
         let roomID = data.roomID;
         let user = data.user;        
-        console.log(id, roomID, user.userid);                
+
+        console.log("newUser : ", id, roomID, user.userid);                
+
         socket.join(roomID);
         socket.to(roomID).broadcast.emit('userJoined', data);
         socket.on('disconnect', () => {
@@ -95,18 +103,36 @@ io.on("connection", (socket) => {
     });
     
     
-  socket.on("REGISTER", (user) => {
-    console.log("📢 User registered:", user);
+    socket.on('changeMedia', (data) => {    
+    	console.log("user change media ");
+        let id = data.id;
+        let roomID = data.roomID;
+        let user = data.user;
+        let videoStream = data.videoStream;            	
+    	socket.join(roomID);    		
+	    socket.to(roomID).broadcast.emit('mediaChanged', data);        
+    });
+    
+    socket.on("userShare", (room, videoStream) => {    
+    	console.log("user shared");    	
+    	socket.join(room);    		
+	    socket.to(room).broadcast.emit('userShared', videoStream);
+    });
+    
+    
+    socket.on("REGISTER", (user) => {
 
-    // Example: join a channel/room
-    if (user.channelid) {
-      socket.join(user.channelid);
-      console.log(`✅ User ${user.userid} joined channel ${user.channelid}`);
+        console.log("📢 User registered:", user.userid);
 
-      // Notify others in the same room
-      socket.to(user.channelid).emit("userJoined", user);
-    }
-  });
+        // Example: join a channel/room
+        if (user.channelid) {
+        socket.join(user.channelid);
+        console.log(`✅ User ${user.userid} joined channel ${user.channelid}`);
+
+        // Notify others in the same room
+        socket.to(user.channelid).emit("userJoined", user);
+        }
+    });
 
     /*****************************************/
     /*  MEMBER ALL PAGE CALL TO ACTIONS
