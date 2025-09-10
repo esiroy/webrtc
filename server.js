@@ -88,6 +88,38 @@ io.on("connection", (socket) => {
     console.log("🔌 New client connected:", socket.id);
 
 
+    // Host creates a room
+    socket.on("create-room", ({ roomId, peerId }) => {
+        rooms[roomId] = { host: peerId, clients: [] };
+        socket.join(roomId);
+        console.log(`Room ${roomId} created by host ${peerId}`);
+    });
+
+    // Client joins an existing room
+    socket.on("join-room", ({ roomId, peerId }) => {
+        if (!rooms[roomId]) {
+        console.log("Room "+ roomId + " does not exist " )
+        socket.emit("room-error", "Room does not exist");
+        return;
+        }
+        rooms[roomId].clients.push(peerId);
+        socket.join(roomId);
+
+        console.log(`Client ${peerId} joined room ${roomId}`);
+
+        // Notify host about new client
+        socket.to(roomId).emit("new-client", peerId);
+
+        // Send host ID back to client
+        socket.emit("host-info", rooms[roomId].host);
+    });
+
+
+    socket.on("rejoin-host", ({ roomId, peerId }) => {
+        console.log("rejoin-room" + roomId + " : " + peerId)
+        socket.to(roomId).emit("reconnect-host", peerId);
+    });    
+
     socket.on('newUser', data => {
         let id = data.id;
         let roomID = data.roomID;
