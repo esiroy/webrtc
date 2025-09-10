@@ -82,6 +82,7 @@ app.get('/:room', cors(corsOptionsDelegate), (req, res) => {
 
 var users = [];
 var roomUsers = [];
+let rooms = {}; // { roomId: { host: peerId, clients: [] } }
 
 io.on("connection", (socket) => {
 
