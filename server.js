@@ -15,35 +15,35 @@ const port = process.env.PORT || 40010;
 let server;
 
 if (fs.existsSync('./file.pem') && fs.existsSync('./file.crt')) {
-  console.log("🔒 Using HTTPS with SSL certs");
-  server = https.createServer({
-    key: fs.readFileSync('./file.pem'),
-    cert: fs.readFileSync('./file.crt')
-  }, app);
+    console.log("🔒 Using HTTPS with SSL certs");
+    server = https.createServer({
+        key: fs.readFileSync('./file.pem'),
+        cert: fs.readFileSync('./file.crt')
+    }, app);
 } else {
-  console.log("🌐 Using HTTP (no SSL certs found)");
-  server = http.createServer(app);
+    console.log("🌐 Using HTTP (no SSL certs found)");
+    server = http.createServer(app);
 }
 
 var users = [];
 
-var whitelist = ['https://mypage.esuccess-inc.com', 
-    'https://mypage.mytutor-jpn.com', 
+var whitelist = ['https://mypage.esuccess-inc.com',
+    'https://mypage.mytutor-jpn.com',
     'https://beta.mytutor-jpn.com'
 ]
 
 var corsOptionsDelegate = function (req, callback) {
-  var corsOptions;
-  if (whitelist.indexOf(req.header('Origin')) !== -1) {
-    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-  }else{
-    corsOptions = { origin: false } // disable CORS for this request
-  }
-  callback(null, corsOptions) // callback expects two parameters: error and options
+    var corsOptions;
+    if (whitelist.indexOf(req.header('Origin')) !== -1) {
+        corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+    } else {
+        corsOptions = { origin: false } // disable CORS for this request
+    }
+    callback(null, corsOptions) // callback expects two parameters: error and options
 }
 
 
-const io = require("socket.io")(server, { cors: { origin: "*", methods: ["GET", "POST"] }});
+const io = require("socket.io")(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
 //const io = require('socket.io')(server, { wsEngine: 'ws' }, { cors: { origin: "*", methods: ["GET", "POST"], transports: ['websocket', 'polling'], credentials: true }, allowEIO3: true });
 
 const { ExpressPeerServer } = require('peer');
@@ -88,12 +88,12 @@ io.on("connection", (socket) => {
     console.log("🔌 New client connected:", socket.id);
 
 
-    socket.on('newUser', data => {          
+    socket.on('newUser', data => {
         let id = data.id;
         let roomID = data.roomID;
-        let user = data.user;        
+        let user = data.user;
 
-        console.log("newUser : ", id, roomID, user.userid);                
+        console.log("newUser : ", id, roomID, user.userid);
 
         socket.join(roomID);
         socket.to(roomID).broadcast.emit('userJoined', data);
@@ -101,72 +101,72 @@ io.on("connection", (socket) => {
             socket.to(roomID).broadcast.emit('userDisconnect', id);
         });
     });
-    
-    
-    socket.on('changeMedia', (data) => {    
-    	console.log("user change media ");
+
+
+    socket.on('changeMedia', (data) => {
+        console.log("user change media ");
         let id = data.id;
         let roomID = data.roomID;
         let user = data.user;
-        let videoStream = data.videoStream;            	
-    	socket.join(roomID);    		
-	    socket.to(roomID).broadcast.emit('mediaChanged', data);        
+        let videoStream = data.videoStream;
+        socket.join(roomID);
+        socket.to(roomID).broadcast.emit('mediaChanged', data);
     });
-    
-    socket.on("userShare", (room, videoStream) => {    
-    	console.log("user shared");    	
-    	socket.join(room);    		
-	    socket.to(room).broadcast.emit('userShared', videoStream);
+
+    socket.on("userShare", (room, videoStream) => {
+        console.log("user shared");
+        socket.join(room);
+        socket.to(room).broadcast.emit('userShared', videoStream);
     });
-    
-    
+
+
     socket.on("REGISTER", (user) => {
 
         console.log("📢 User registered:", user.userid);
 
         // Example: join a channel/room
         if (user.channelid) {
-        socket.join(user.channelid);
-        console.log(`✅ User ${user.userid} joined channel ${user.channelid}`);
+            socket.join(user.channelid);
+            console.log(`✅ User ${user.userid} joined channel ${user.channelid}`);
 
-        // Notify others in the same room
-        socket.to(user.channelid).emit("userJoined", user);
+            // Notify others in the same room
+            socket.to(user.channelid).emit("userJoined", user);
         }
     });
 
     /*****************************************/
     /*  MEMBER ALL PAGE CALL TO ACTIONS
-    /*****************************************/  
-  socket.on("CALL_USER", (data) => {
-    console.log("call user", data);
-    //io.to('' + data.channelid + '').emit("CALL_USER", data);
-    io.sockets.emit("CALL_USER", data);
-  });
+    /*****************************************/
+    socket.on("CALL_USER", (data) => {
+        console.log("call user", data);
+        //io.to('' + data.channelid + '').emit("CALL_USER", data);
+        io.sockets.emit("CALL_USER", data);
+    });
 
-  socket.on("CALL_USER_PINGBACK", (data) => {
-    console.log("call user pingback");
+    socket.on("CALL_USER_PINGBACK", (data) => {
+        console.log("call user pingback");
 
-    io.to('' + data.channelid + '').emit("CALL_USER_PINGBACK", data);
-  });
-
-
-  socket.on("ACCEPT_CALL", (data) => {
-    console.log("accpet call");
-    io.sockets.emit("ACCEPT_CALL", data);
-  });
+        io.to('' + data.channelid + '').emit("CALL_USER_PINGBACK", data);
+    });
 
 
-  socket.on("DROP_CALL", (data) => {
-    io.sockets.emit("DROP_CALL", data);
-  });
+    socket.on("ACCEPT_CALL", (data) => {
+        console.log("accpet call");
+        io.sockets.emit("ACCEPT_CALL", data);
+    });
 
 
-  socket.on("disconnect", () => {
-    console.log("❌ Client disconnected:", socket.id);
-  });
+    socket.on("DROP_CALL", (data) => {
+        io.sockets.emit("DROP_CALL", data);
+    });
 
 
-/*****************************************/
+    socket.on("disconnect", () => {
+        console.log("❌ Client disconnected:", socket.id);
+    });
+
+
+    /*****************************************/
     /*  CANVAS SERVER
     /*****************************************/
 
@@ -176,11 +176,11 @@ io.on("connection", (socket) => {
     });
 
 
-   
+
     socket.on("SEND_DRAWING", (data) => {
-        io.to(data.channelid).emit('UPDATE_DRAWING', data);        
+        io.to(data.channelid).emit('UPDATE_DRAWING', data);
     });
-    
+
 
     socket.on("CREATE_NEW_SLIDE", (data) => {
         io.to('' + data.channelid + '').emit("CREATE_NEW_SLIDE", data);
@@ -255,8 +255,8 @@ io.on("connection", (socket) => {
 
     socket.on("STOP_MEMBER_TIMER", (data) => {
         io.to('' + data.channelid + '').emit("STOP_MEMBER_TIMER", data);
-    });    
-    
+    });
+
 });
 
 
