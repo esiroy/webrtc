@@ -178,8 +178,7 @@ io.on("connection", (socket) => {
 
     socket.on("CALL_USER_PINGBACK", (data) => {
         console.log("call user pingback");
-
-        io.to('' + data.channelid + '').emit("CALL_USER_PINGBACK", data);
+        io.to(data.channelid).emit("CALL_USER_PINGBACK", data);
     });
 
 
@@ -202,36 +201,29 @@ io.on("connection", (socket) => {
     /*****************************************/
     /*  CANVAS SERVER
     /*****************************************/
-
-
     socket.on("START_SLIDER", (data) => {
         io.sockets.emit("START_SLIDER", data);
     });
 
-
-
     socket.on("SEND_DRAWING", (data) => {
+        console.log("send drawing")
         io.to(data.channelid).emit('UPDATE_DRAWING', data);
     });
-
 
     socket.on("CREATE_NEW_SLIDE", (data) => {
         io.to('' + data.channelid + '').emit("CREATE_NEW_SLIDE", data);
     });
 
-
     socket.on("GOTO_SLIDE", (data) => {
-        io.to('' + data.channelid + '').emit("GOTO_SLIDE", data);
+        io.to(data.channelid).emit("GOTO_SLIDE", data);
     });
-
 
     socket.on("SEND_SLIDE_PRIVATE_MESSAGE", (data) => {
-        io.to('' + data.channelid + '').emit("SEND_SLIDE_PRIVATE_MESSAGE", data);
+        io.to(data.channelid).emit("SEND_SLIDE_PRIVATE_MESSAGE", data);
     });
 
-
     socket.on("TUTOR_SELECTED_NEW_SLIDES", (data) => {
-        io.to('' + data.channelid + '').emit("TUTOR_SELECTED_NEW_SLIDES", data);
+        io.to(data.channelid).emit("TUTOR_SELECTED_NEW_SLIDES", data);
     });
 
 
@@ -242,53 +234,56 @@ io.on("connection", (socket) => {
     /*****************************************/
 
     socket.on("JOIN_SESSION", (data) => {
-        io.to('' + data.channelid + '').emit("JOIN_SESSION", data);
+        io.to( data.channelid).emit("JOIN_SESSION", data);
     });
 
     //@desc: this will send a ping to determin if online
     socket.on("JOIN_SESSION_PINGBACK", (data) => {
-        io.to('' + data.channelid + '').emit("JOIN_SESSION_PINGBACK", data);
+        io.to(data.channelid).emit("JOIN_SESSION_PINGBACK", data);
     });
 
 
     //@desc: this will send a pingback to sender to signal online status
     socket.on("TUTOR_JOINED", (data) => {
-        io.to('' + data.channelid + '').emit("TUTOR_JOINED", data);
+        io.to(data.channelid).emit("TUTOR_JOINED", data);
     });
 
 
     socket.on("MEMBER_JOINED", (data) => {
-        io.to('' + data.channelid + '').emit("MEMBER_JOINED", data);
+        io.to(data.channelid).emit("MEMBER_JOINED", data);
     });
 
     socket.on("LEAVE_SESSION", (data) => {
-        io.to('' + data.channelid + '').emit("LEAVE_SESSION", data);
+        io.to(data.channelid).emit("LEAVE_SESSION", data);
     });
 
 
     socket.on("START_SESSION", (data) => {
-        io.to('' + data.channelid + '').emit("START_SESSION", data);
+        console.log("START_SESSION", data)
+        io.to(data.channelid).emit("START_SESSION", data);
+        //io.to(data.channelid).emit("TEST_START_TIMER", data);
     });
 
     socket.on("CANCEL_SESSION", (data) => {
-        io.to('' + data.channelid + '').emit("CANCEL_SESSION", data);
+        io.to(data.channelid).emit("CANCEL_SESSION", data);
     });
 
     socket.on("END_SESSION", (data) => {
-        io.to('' + data.channelid + '').emit("END_SESSION", data);
+        io.to(data.channelid).emit("END_SESSION", data);
     });
 
     socket.on("START_MEMBER_TIMER", (data) => {
-        io.to('' + data.channelid + '').emit("START_MEMBER_TIMER", data);
+        console.log("start member timer emitted by tutor")
+        io.to(data.channelid).emit("START_MEMBER_TIMER", data);
     });
 
     socket.on("PAUSE_MEMBER_TIMER", (data) => {
-        io.to('' + data.channelid + '').emit("PAUSE_MEMBER_TIMER", data);
+        io.to(data.channelid).emit("PAUSE_MEMBER_TIMER", data);
     });
 
     socket.on("STOP_MEMBER_TIMER", (data) => {
-        io.to('' + data.channelid + '').emit("STOP_MEMBER_TIMER", data);
-    });
+        io.to(data.channelid).emit("STOP_MEMBER_TIMER", data);
+    });    
 
 });
 
