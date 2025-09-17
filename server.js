@@ -146,12 +146,17 @@ io.on("connection", (socket) => {
         socket.to(roomID).broadcast.emit('mediaChanged', data);
     });
 
-    socket.on("userShare", (room, videoStream) => {
-        console.log("user shared");
-        socket.join(room);
-        socket.to(room).broadcast.emit('userShared', videoStream);
-    });
 
+      socket.on("host-start-screenshare", ({ roomId }) => {
+          console.log("host has started screen sharing");
+          socket.to(roomId).broadcast.emit('host-started-sharing', roomId);
+      });
+
+
+      socket.on("host-stop-screenshare", ({ roomId }) => {
+          console.log("user hast stopped screen sharing");
+          socket.to(roomId).broadcast.emit('host-stopped-sharing', roomId);
+      });
 
     socket.on("REGISTER", (user) => {
 
