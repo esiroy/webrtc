@@ -79,14 +79,44 @@ app.get('/:room', cors(corsOptionsDelegate), (req, res) => {
 });
 
 
-
-var users = [];
-var roomUsers = [];
 let rooms = {}; // { roomId: { host: peerId, clients: [] } }
+const users = {}; // { socketId: user }
 
 io.on("connection", (socket) => {
 
     console.log("🔌 New client connected:", socket.id);
+
+
+
+  socket.on("disconnecting", () => {
+    // Loop through rooms before socket leaves
+    for (const roomId of socket.rooms) {
+      if (roomId !== socket.id) {
+        console.log(`⚠️ ${socket.id} is leaving room ${roomId}`, socket.username);
+        socket.to(roomId).emit("user_disconnected", {
+          socketId: socket.id,
+          userId: socket.userId,
+          username: socket.username,
+          usertype: socket.usertype
+        });        
+      }
+    }
+  });
+
+ 
+  socket.on("disconnect", (reason) => {
+    const user = users[socket.id];
+    if (user) {
+      console.log(`❌ Public User disconnected: ${user.username} (${user.userid}) Reason: ${reason}`);
+      io.sockets.emit("user_disconnected", {          
+          userId: socket.userId,
+          username: socket.username,
+          usertype: socket.usertype
+        });
+      delete users[socket.id]; // cleanup    
+    }
+
+  });
 
 
     // Host creates a room
@@ -169,6 +199,9 @@ io.on("connection", (socket) => {
 
             // Notify others in the same room
             socket.to(user.channelid).emit("userJoined", user);
+        } else {
+            console.log("public join");
+            socket.join(user.userid);
         }
     });
 
@@ -186,11 +219,24 @@ io.on("connection", (socket) => {
         io.to(data.channelid).emit("CALL_USER_PINGBACK", data);
     });
 
-
+    /*
     socket.on("ACCEPT_CALL", (data) => {
         console.log("accpet call");
         io.sockets.emit("ACCEPT_CALL", data);
     });
+    */
+
+    socket.on("ACCEPT_CALL", (data) => {
+        console.log("accpet call");        
+        io.to(data.channelid).emit("ACCEPT_CALL", data);        
+    });
+
+
+    socket.on("MEMBER_ACCEPTED_CALL", (data) => {   
+        console.log("MEMBER_ACCEPTED_CALL");     
+        io.to(data.channelid).emit("MEMBER_ACCEPTED_CALL", data);        
+    });
+
 
 
     socket.on("DROP_CALL", (data) => {
