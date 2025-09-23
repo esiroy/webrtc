@@ -188,22 +188,28 @@ io.on("connection", (socket) => {
           socket.to(roomId).broadcast.emit('host-stopped-sharing', roomId);
       });
 
-    socket.on("REGISTER", (user) => {
 
-        console.log("📢 User registered:", user.userid);
+      socket.on("REGISTER", (user) => {
+          console.log("📢 User registered:", user);
 
-        // Example: join a channel/room
-        if (user.channelid) {
-            socket.join(user.channelid);
-            console.log(`✅ User ${user.userid} joined channel ${user.channelid}`);
+          socket.userId = user.userid;
+          socket.username = user.username;
+          socket.usertype = user.type;
+       
+          users[socket.id] = user;
 
-            // Notify others in the same room
-            socket.to(user.channelid).emit("userJoined", user);
-        } else {
+
+          if (user.channelid) {
+              socket.join(user.channelid);
+              console.log(`✅ User ${user.userid} joined channel ${user.channelid}`);
+
+              // Notify others in the same room
+              socket.to(user.channelid).emit("userJoined", user);
+          } else {
             console.log("public join");
             socket.join(user.userid);
-        }
-    });
+          }
+      });
 
     /*****************************************/
     /*  MEMBER ALL PAGE CALL TO ACTIONS
