@@ -25,7 +25,6 @@ if (fs.existsSync('./file.pem') && fs.existsSync('./file.crt')) {
     server = http.createServer(app);
 }
 
-var users = [];
 
 var whitelist = ['https://mypage.esuccess-inc.com',
     'https://mypage.mytutor-jpn.com',
