@@ -112,10 +112,10 @@ io.on("connection", (socket) => {
           usertype: socket.usertype
         });
 
-        /*
+      
         if (socket.usertype == "TUTOR") {
           socket.to(roomId).emit("MEMBER_RECONNECT");   
-        }*/
+        }
 
       }
     }
@@ -126,9 +126,7 @@ io.on("connection", (socket) => {
     const user = users[socket.id];
     if (user) {
       console.log(`❌ Public User disconnected: ${user.username} (${user.userid})  (${user.channelid})  Reason: ${reason}`);
-
-
-      socket.to(user.channelid).emit("MEMBER_RECONNECT");   
+      //socket.to(user.channelid).emit("MEMBER_RECONNECT");   
 
       io.sockets.emit("user_disconnected", {          
           userId: socket.userId,
