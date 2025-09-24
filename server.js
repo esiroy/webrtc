@@ -85,19 +85,38 @@ io.on("connection", (socket) => {
 
     console.log("🔌 New client connected:", socket.id);
 
+  socket.on("reconnect_attempt", () => {
+      console.log(`🔄 Client ${socket.id} is trying to reconnect...`);
+    });
+
+    socket.on("MEMBER_RECONNECT", (user) => {
+      console.log("RECONNECT TO : ", user.channelid);  
+  
+      socket.to(user.channelid).emit("MEMBER_RECONNECT"); 
+
+    });
+
 
 
   socket.on("disconnecting", () => {
     // Loop through rooms before socket leaves
     for (const roomId of socket.rooms) {
       if (roomId !== socket.id) {
-        console.log(`⚠️ ${socket.id} is leaving room ${roomId}`, socket.username);
+
+        console.log(`⚠️ ${socket.id} is leaving room ${roomId}`, socket.username);       
+
         socket.to(roomId).emit("user_disconnected", {
           socketId: socket.id,
           userId: socket.userId,
           username: socket.username,
           usertype: socket.usertype
-        });        
+        });
+
+        /*
+        if (socket.usertype == "TUTOR") {
+          socket.to(roomId).emit("MEMBER_RECONNECT");   
+        }*/
+
       }
     }
   });
@@ -106,7 +125,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", (reason) => {
     const user = users[socket.id];
     if (user) {
-      console.log(`❌ Public User disconnected: ${user.username} (${user.userid}) Reason: ${reason}`);
+      console.log(`❌ Public User disconnected: ${user.username} (${user.userid})  (${user.channelid})  Reason: ${reason}`);
+
+
+      socket.to(user.channelid).emit("MEMBER_RECONNECT");   
+
       io.sockets.emit("user_disconnected", {          
           userId: socket.userId,
           username: socket.username,
@@ -339,7 +362,11 @@ io.on("connection", (socket) => {
 
     socket.on("STOP_MEMBER_TIMER", (data) => {
         io.to(data.channelid).emit("STOP_MEMBER_TIMER", data);
-    });    
+    });  
+
+
+
+
 
 });
 
